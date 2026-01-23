@@ -58,7 +58,32 @@ const offres = [
 
 <script>
     const button = document.getElementById("favori-button");
+    const grid = document.querySelector(".offres-grid");
     let showOnlyFavorites = false;
+
+    grid?.addEventListener("click", (event) => {
+        const target = event.target;
+        if (!(target instanceof Element)) return;
+
+        const toggle = target.closest(".favori-toggle");
+        if (!toggle) return;
+
+        const isFavori = toggle.getAttribute("data-favori") === "true";
+        const nextValue = !isFavori;
+
+        toggle.setAttribute("data-favori", nextValue ? "true" : "false");
+        toggle.setAttribute("aria-pressed", nextValue ? "true" : "false");
+        toggle.classList.toggle("is-fav", nextValue);
+        toggle.textContent = nextValue ? "Favori" : "Ajouter";
+
+        const cardWrapper = toggle.closest(".offre");
+        if (cardWrapper) {
+            cardWrapper.dataset.favori = nextValue ? "true" : "false";
+            if (showOnlyFavorites && !nextValue) {
+                cardWrapper.style.display = "none";
+            }
+        }
+    });
 
     button?.addEventListener("click", () => {
         showOnlyFavorites = !showOnlyFavorites;
