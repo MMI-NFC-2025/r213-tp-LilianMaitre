@@ -55,4 +55,16 @@ const offres = [
             </div>
         ))}
     </div>
+
+    
+    <button id="favori-button" class="bg-slate-600 rounded-lg text-white p-2">Afficher les favoris</button>
+<div>
+    {
+        offres.map(offre => (
+            <div class="offre" data-favori={offre.favori.toString()}>
+                <!-- Contenu de l'offre -->
+            </div>
+        ))
+    }
+</div>
 </Layout>
