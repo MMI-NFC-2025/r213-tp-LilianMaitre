@@ -1,1 +1,50 @@
 @import "tailwindcss";
+
+.site-header {
+	background: #22223b;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+	border-radius: 0 0 12px 12px;
+}
+
+.header-inner {
+	max-width: 1100px;
+	margin: 0 auto;
+	padding: 1rem 2rem;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 2rem;
+}
+
+.brand {
+	color: #f2e9e4;
+	text-decoration: none;
+	font-weight: 700;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+}
+
+.header-nav {
+	display: flex;
+	gap: 1.5rem;
+	align-items: center;
+}
+
+.header-nav a {
+	color: #f2e9e4;
+	text-decoration: none;
+	font-weight: 500;
+	font-size: 1.1rem;
+	transition: color 0.2s;
+}
+
+.header-nav a:hover {
+	color: #9a8c98;
+}
+
+@media (max-width: 640px) {
+	.header-inner {
+		flex-direction: column;
+		gap: 0.75rem;
+	}
+}
