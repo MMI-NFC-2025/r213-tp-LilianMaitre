@@ -1,6 +1,7 @@
 ---
 import "../styles/global.css";
 import Layout from "../layouts/Layout.astro";
+import OffresCard from "../components/OffresCard.astro";
 
 const offres = [
     {
@@ -12,7 +13,7 @@ const offres = [
         nomMaison: "Beverly Springfield",
         prix: 2700,
         surface: 45,
-        imgUrl: "image1.png",
+        imgUrl: "image1.jpg",
     },
     {
         adresse: "2699 Green Valley, Highland Lake",
@@ -23,7 +24,7 @@ const offres = [
         nomMaison: "Palm Harbor",
         prix: 2095,
         surface: 42,
-        imgUrl: "image2.png",
+        imgUrl: "image2.jpg",
     },
     {
         adresse: "909 Woodland St, Michigan, IN",
@@ -34,37 +35,45 @@ const offres = [
         nomMaison: "Faulkner Ave",
         prix: 4550,
         surface: 80,
-        imgUrl: "image3.png",
+        imgUrl: "image3.jpg",
     },
 ];
 ---
 
 <Layout titre="Offres">
-    <h1>Offres</h1>
-    <div>
-        {offres.map((offre) => (
-            <div>
-                <img src={offre.imgUrl} alt={offre.nomMaison} />
-                <h2>{offre.nomMaison}</h2>
-                <p>Adresse: {offre.adresse}</p>
-                <p>Prix: ${offre.prix} / mois</p>
-                <p>Surface: {offre.surface} m2</p>
-                <p>Chambres: {offre.nbChambres}</p>
-                <p>Salles de bain: {offre.nbSdb}</p>
-                <p>Favori: {offre.favori ? "Oui" : "Non"}</p>
-            </div>
-        ))}
+    <button id="favori-button" class="bg-slate-600 rounded-lg text-white p-2">
+        Afficher les favoris</button
+    >
+    <div class="offres-grid">
+        {
+            offres.map((offre) => (
+                <div class="offre" data-favori={offre.favori.toString()}>
+                    <OffresCard offre={offre} />
+                </div>
+            ))
+        }
     </div>
 
-    
-    <button id="favori-button" class="bg-slate-600 rounded-lg text-white p-2">Afficher les favoris</button>
-<div>
-    {
-        offres.map(offre => (
-            <div class="offre" data-favori={offre.favori.toString()}>
-                <!-- Contenu de l'offre -->
-            </div>
-        ))
-    }
-</div>
 </Layout>
+
+<script>
+    const button = document.getElementById("favori-button");
+    let showOnlyFavorites = false;
+
+    button?.addEventListener("click", () => {
+        showOnlyFavorites = !showOnlyFavorites;
+        const offres = document.querySelectorAll(".offre");
+
+        offres.forEach((offre) => {
+            const isFavori = offre.dataset.favori === "true";
+
+            if (showOnlyFavorites) {
+                offre.style.display = isFavori ? "block" : "none";
+                button.textContent = "Afficher tout";
+            } else {
+                offre.style.display = "block";
+                button.textContent = "Afficher les favoris";
+            }
+        });
+    });
+</script>

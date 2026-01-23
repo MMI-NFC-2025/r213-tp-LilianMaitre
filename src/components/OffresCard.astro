@@ -1,0 +1,112 @@
+---
+const { offre } = Astro.props;
+---
+
+<article class="offre-card">
+    <div class="offre-image">
+        <img src={offre.imgUrl} alt={offre.nomMaison} loading="lazy" />
+    </div>
+    <div class="offre-body">
+        <h2 class="offre-title">{offre.nomMaison}</h2>
+        <p class="offre-address">{offre.adresse}</p>
+        <div class="offre-meta">
+            <span>{offre.surface} m2</span>
+            <span>{offre.nbChambres} ch</span>
+            <span>{offre.nbSdb} sdb</span>
+        </div>
+        <div class="offre-footer">
+            <span class="offre-price">${offre.prix} / mois</span>
+            <span class:list={["offre-favori", { "is-fav": offre.favori }]}>
+                {offre.favori ? "Favori" : "Non favori"}
+            </span>
+        </div>
+    </div>
+</article>
+
+<style>
+	:global(.offres-grid) {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 1rem;
+		align-items: stretch;
+	}
+
+	:global(.offre) {
+		flex: 0 0 220px;
+	}
+
+	.offre-card {
+		background: #ffffff;
+		border: 1px solid #e9e5df;
+		border-radius: 14px;
+		overflow: hidden;
+		display: flex;
+		flex-direction: column;
+		box-shadow: 0 8px 16px rgba(34, 34, 59, 0.08);
+		height: 100%;
+	}
+
+	.offre-image {
+		background: #e5e5ef;
+		aspect-ratio: 4 / 2.6;
+	}
+
+	.offre-image img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		display: block;
+	}
+
+	.offre-body {
+		padding: 0.75rem 0.9rem 0.9rem;
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+	}
+
+	.offre-title {
+		margin: 0;
+		font-size: 1rem;
+	}
+
+	.offre-address {
+		margin: 0;
+		color: #4a4e69;
+		font-size: 0.85rem;
+	}
+
+	.offre-meta {
+		display: flex;
+		gap: 0.75rem;
+		flex-wrap: wrap;
+		font-size: 0.8rem;
+		color: #5c5f73;
+	}
+
+	.offre-footer {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 0.75rem;
+	}
+
+	.offre-price {
+		font-weight: 700;
+		color: #22223b;
+		font-size: 0.9rem;
+	}
+
+	.offre-favori {
+		font-size: 0.8rem;
+		padding: 0.2rem 0.55rem;
+		border-radius: 999px;
+		background: #f2e9e4;
+		color: #4a4e69;
+	}
+
+	.offre-favori.is-fav {
+		background: #9a8c98;
+		color: #ffffff;
+	}
+</style>
