@@ -1,11 +1,46 @@
 ---
 const { offre } = Astro.props;
 import PbImage from "./PbImage.astro";
+
+const images = Array.isArray(offre.maison_images)
+	? offre.maison_images
+	: offre.maison_images
+		? [offre.maison_images]
+		: [];
 ---
 
 <article class="offre-card">
-	<div class="offre-image">
-		<PbImage record={offre} recordImage={offre.maison_images[0]} />
+	<div class="offre-image" data-carousel>
+		<div class="offre-carousel-track">
+			{
+				images.length > 0 ? (
+					images.map((image, index) => (
+						<div
+							class:list={["offre-carousel-slide", { "is-active": index === 0 }]}
+							data-carousel-slide
+							aria-hidden={index === 0 ? "false" : "true"}
+						>
+							<PbImage record={offre} recordImage={image} />
+						</div>
+					))
+				) : (
+					<div class="offre-carousel-slide is-active" data-carousel-slide aria-hidden="false">
+						<div class="offre-placeholder">Aucune image</div>
+					</div>
+				)
+			}
+		</div>
+		<button class="offre-carousel-btn prev" type="button" data-carousel-prev aria-label="Image precedente">
+			&lt;
+		</button>
+		<button class="offre-carousel-btn next" type="button" data-carousel-next aria-label="Image suivante">
+			&gt;
+		</button>
+		{images.length > 1 && (
+			<div class="offre-carousel-counter" data-carousel-counter>
+				1 / {images.length}
+			</div>
+		)}
 	</div>
 	<div class="offre-body">
 		<h2 class="offre-title">{offre.maison_name}</h2>
@@ -55,6 +90,8 @@ import PbImage from "./PbImage.astro";
 	.offre-image {
 		background: #e5e5ef;
 		aspect-ratio: 4 / 2.9;
+		position: relative;
+		overflow: hidden;
 	}
 
 	.offre-image img {
@@ -62,6 +99,67 @@ import PbImage from "./PbImage.astro";
 		height: 100%;
 		object-fit: cover;
 		display: block;
+	}
+
+	.offre-carousel-track {
+		height: 100%;
+	}
+
+	.offre-carousel-slide {
+		display: none;
+		height: 100%;
+	}
+
+	.offre-carousel-slide.is-active {
+		display: block;
+	}
+
+	.offre-placeholder {
+		height: 100%;
+		display: grid;
+		place-items: center;
+		color: #4a4e69;
+		font-size: 0.9rem;
+	}
+
+	.offre-carousel-btn {
+		position: absolute;
+		top: 50%;
+		transform: translateY(-50%);
+		border: none;
+		background: rgba(44, 44, 81, 0.7);
+		color: #ffffff;
+		width: 2rem;
+		height: 2rem;
+		border-radius: 999px;
+		cursor: pointer;
+		display: grid;
+		place-items: center;
+		font-size: 1rem;
+	}
+
+	.offre-carousel-btn.prev {
+		left: 0.5rem;
+	}
+
+	.offre-carousel-btn.next {
+		right: 0.5rem;
+	}
+
+	.offre-image.is-single .offre-carousel-btn,
+	.offre-image.is-single .offre-carousel-counter {
+		display: none;
+	}
+
+	.offre-carousel-counter {
+		position: absolute;
+		right: 0.5rem;
+		bottom: 0.5rem;
+		background: rgba(34, 34, 59, 0.7);
+		color: #ffffff;
+		font-size: 0.75rem;
+		padding: 0.2rem 0.45rem;
+		border-radius: 999px;
 	}
 
 	.offre-body {
@@ -130,3 +228,40 @@ import PbImage from "./PbImage.astro";
 		color: #ffffff;
 	}
 </style>
+
+<script>
+	const carousels = document.querySelectorAll("[data-carousel]");
+
+	carousels.forEach((carousel) => {
+		const slides = Array.from(carousel.querySelectorAll("[data-carousel-slide]"));
+		const prev = carousel.querySelector("[data-carousel-prev]");
+		const next = carousel.querySelector("[data-carousel-next]");
+		const counter = carousel.querySelector("[data-carousel-counter]");
+
+		if (slides.length <= 1) {
+			carousel.classList.add("is-single");
+			return;
+		}
+
+		let index = slides.findIndex((slide) => slide.classList.contains("is-active"));
+		if (index < 0) index = 0;
+
+		const update = (nextIndex) => {
+			index = (nextIndex + slides.length) % slides.length;
+			slides.forEach((slide, i) => {
+				const isActive = i === index;
+				slide.classList.toggle("is-active", isActive);
+				slide.setAttribute("aria-hidden", isActive ? "false" : "true");
+			});
+
+			if (counter) {
+				counter.textContent = `${index + 1} / ${slides.length}`;
+			}
+		};
+
+		prev?.addEventListener("click", () => update(index - 1));
+		next?.addEventListener("click", () => update(index + 1));
+
+		update(index);
+	});
+</script>
