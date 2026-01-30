@@ -1,31 +1,32 @@
 ---
 const { offre } = Astro.props;
+import PbImage from "./PbImage.astro";
 ---
 
 <article class="offre-card">
-    <div class="offre-image">
-        <img src={offre.imgUrl} alt={offre.nomMaison} loading="lazy" />
-    </div>
-    <div class="offre-body">
-        <h2 class="offre-title">{offre.nomMaison}</h2>
-        <p class="offre-address">{offre.adresse}</p>
-        <div class="offre-meta">
-            <span>{offre.surface} m2</span>
-            <span>{offre.nbChambres} ch</span>
-            <span>{offre.nbSdb} sdb</span>
-        </div>
-        <div class="offre-footer">
-            <span class="offre-price">${offre.prix} / mois</span>
-            <button
-                class:list={["favori-toggle", { "is-fav": offre.favori }]}
-                type="button"
-                data-favori={offre.favori ? "true" : "false"}
-                aria-pressed={offre.favori ? "true" : "false"}
-            >
-                {offre.favori ? "Favori" : "Ajouter"}
-            </button>
-        </div>
-    </div>
+	<div class="offre-image">
+		<PbImage record={offre} recordImage={offre.maison_images[0]} />
+	</div>
+	<div class="offre-body">
+		<h2 class="offre-title">{offre.maison_name}</h2>
+		<p class="offre-address">{offre.maison_adresse}</p>
+		<div class="offre-meta">
+			<span>{offre.maison_surface} m2</span>
+			<span>{offre.chambres_nombre} ch</span>
+			<span>{offre.nombre_SdB} sdb</span>
+		</div>
+		<div class="offre-footer">
+			<span class="offre-price">${offre.maison_prix} / mois</span>
+			<button
+				class:list={["favori-toggle", { "is-fav": offre.favori }]}
+				type="button"
+				data-favori={offre.favori ? "true" : "false"}
+				aria-pressed={offre.favori ? "true" : "false"}
+			>
+				{offre.favori ? "Favori" : "Ajouter"}
+			</button>
+		</div>
+	</div>
 </article>
 
 <style>
@@ -110,8 +111,11 @@ const { offre } = Astro.props;
 		padding: 0.25rem 0.7rem;
 		border-radius: 999px;
 		cursor: pointer;
-		transition: transform 0.15s ease, background 0.2s ease,
-			color 0.2s ease, border-color 0.2s ease;
+		transition:
+			transform 0.15s ease,
+			background 0.2s ease,
+			color 0.2s ease,
+			border-color 0.2s ease;
 	}
 
 	.favori-toggle:hover {

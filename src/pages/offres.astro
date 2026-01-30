@@ -2,10 +2,9 @@
 import "../styles/global.css";
 import Layout from "../layouts/Layout.astro";
 import OffresCard from "../components/OffresCard.astro";
-import { getOffres } from "../js/backend";
+import { getOffres } from "../js/backend.mjs";
 
 const offres = await getOffres();
-
 ---
 
 <Layout titre="Offres">
@@ -21,7 +20,6 @@ const offres = await getOffres();
             ))
         }
     </div>
-
 </Layout>
 
 <script>
