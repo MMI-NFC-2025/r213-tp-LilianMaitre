@@ -1,0 +1,28 @@
+---
+import Layout from "../../../layouts/Layout.astro";
+import OffresCard from "../../../components/OffresCard.astro";
+import { getOffres } from "../../../../backend.mjs";
+
+const { surface } = Astro.params;
+const minSurface = Number(surface);
+const safeMinSurface = Number.isFinite(minSurface) ? minSurface : 0;
+
+const rawOffres = await getOffres();
+const maisons = Array.isArray(rawOffres) ? rawOffres : rawOffres?.data ?? [];
+const maisonsFiltrees = maisons.filter(
+    (m) => (m.maison_surface ?? 0) >= safeMinSurface
+);
+---
+
+<Layout titre={`Surface > ${safeMinSurface} m2`}>
+    <h1>Surface demandee : {safeMinSurface} m2</h1>
+    <div class="offres-grid">
+        {
+            maisonsFiltrees.map((offre) => (
+                <div class="offre">
+                    <OffresCard offre={offre} />
+                </div>
+            ))
+        }
+    </div>
+</Layout>

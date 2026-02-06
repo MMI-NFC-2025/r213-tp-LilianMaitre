@@ -87,6 +87,12 @@ const offres = Array.isArray(rawOffres) ? rawOffres : rawOffres?.data ?? [];
             </div>
         </div>
     </section>
+    <a
+        href="/offres/surface/150"
+        class="mb-6 inline-flex items-center gap-2 text-sm font-semibold text-slate-700 hover:text-slate-900"
+    >
+        Voir les maisons avec une surface &gt; 150 m²
+    </a>
     <div class="offres-grid">
         {
             offres.map((offre) => (
