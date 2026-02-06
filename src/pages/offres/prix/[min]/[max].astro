@@ -1,0 +1,32 @@
+---
+import Layout from "../../../../layouts/Layout.astro";
+import OffresCard from "../../../../components/OffresCard.astro";
+import { byPrix } from "../../../../../backend.mjs";
+const { min, max } = Astro.params;
+
+const minPrix = Number(min);
+const maxPrix = Number(max);
+
+const maisons = await byPrix(minPrix, maxPrix);
+
+const maisonsFiltrees = (maisons ?? []).filter(
+    (m) => m.maison_prix >= minPrix && m.maison_prix <= maxPrix,
+);
+---
+
+<head>
+    <meta charset="utf-8" />
+</head>
+
+<Layout titre={`Prix entre ${minPrix.toLocaleString()} € et ${maxPrix.toLocaleString()} €`}>
+    <h1>Prix demandés : entre {minPrix.toLocaleString()} € et {maxPrix.toLocaleString()} €</h1>
+    <div class="offres-grid">
+        {
+            maisonsFiltrees.map((offre) => (
+                <div class="offre">
+                    <OffresCard offre={offre} />
+                </div>
+            ))
+        }
+    </div>
+</Layout>

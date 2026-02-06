@@ -5,7 +5,7 @@ import OffresCard from "../../components/OffresCard.astro";
 import { getOffres } from "../../../backend.mjs";
 
 const rawOffres = await getOffres();
-const offres = Array.isArray(rawOffres) ? rawOffres : rawOffres?.data ?? [];
+const offres = Array.isArray(rawOffres) ? rawOffres : (rawOffres?.data ?? []);
 ---
 
 <Layout titre="Offres">
@@ -93,6 +93,18 @@ const offres = Array.isArray(rawOffres) ? rawOffres : rawOffres?.data ?? [];
     >
         Voir les maisons avec une surface &gt; 150 m²
     </a>
+
+    <a
+        href="/offres/prix/450000"
+        class="mb-6 inline-flex items-center gap-2 text-sm font-semibold text-slate-700 hover:text-slate-900"
+    >
+        Voir les maisons avec un prix &lt; 450 000$/mois
+    </a>
+
+    <a href="/offres/prix/150000/300000">
+        Voir les maisons entre 150 000 € et 300 000 €
+    </a>
+
     <div class="offres-grid">
         {
             offres.map((offre) => (
@@ -150,7 +162,8 @@ const offres = Array.isArray(rawOffres) ? rawOffres : rawOffres?.data ?? [];
                 if (showOnlyFavorites && !isFavori) visible = false;
                 if (minPrice !== null && price < minPrice) visible = false;
                 if (maxPrice !== null && price > maxPrice) visible = false;
-                if (minChambres !== null && chambres < minChambres) visible = false;
+                if (minChambres !== null && chambres < minChambres)
+                    visible = false;
                 if (minSdb !== null && sdb < minSdb) visible = false;
                 if (villeQuery && !ville.includes(villeQuery)) visible = false;
 

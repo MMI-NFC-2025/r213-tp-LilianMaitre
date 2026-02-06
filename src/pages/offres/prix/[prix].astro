@@ -1,0 +1,28 @@
+---
+import Layout from "../../../layouts/Layout.astro";
+import OffresCard from "../../../components/OffresCard.astro";
+import { getOffres } from "../../../../backend.mjs";
+
+const { prix } = Astro.params;
+const maxPrix = Number(prix);
+const safeMaxPrix = Number.isFinite(maxPrix) ? maxPrix : 0;
+
+const rawOffres = await getOffres();
+const maisons = Array.isArray(rawOffres) ? rawOffres : rawOffres?.data ?? [];
+const maisonsFiltrees = maisons.filter(
+    (m) => (m.maison_prix ?? 0) <= safeMaxPrix
+);
+---
+
+<Layout titre={`Prix < ${safeMaxPrix}`}>
+    <h1>Prix demande : {safeMaxPrix}</h1>
+    <div class="offres-grid">
+        {
+            maisonsFiltrees.map((offre) => (
+                <div class="offre">
+                    <OffresCard offre={offre} />
+                </div>
+            ))
+        }
+    </div>
+</Layout>

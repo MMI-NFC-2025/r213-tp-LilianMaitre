@@ -1,3 +1,4 @@
+
 import PocketBase from 'pocketbase';
 
 const db = new PocketBase('http://127.0.0.1:8090');
@@ -144,3 +145,15 @@ export async function getOffre(id) {
     }
 }
 
+export async function byPrix(minPrix, maxPrix) {
+    try {
+        const data = await db.collection("maisons").getFullList({
+            sort: "-created",
+            filter: `maison_prix >= ${minPrix} && maison_prix <= ${maxPrix}`,
+        });
+        return data;
+    } catch (error) {
+        console.log("Erreur filtre prix", error);
+        return null;
+    }
+}
