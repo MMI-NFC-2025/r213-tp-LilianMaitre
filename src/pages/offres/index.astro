@@ -1,0 +1,192 @@
+---
+import "../../styles/global.css";
+import Layout from "../../layouts/Layout.astro";
+import OffresCard from "../../components/OffresCard.astro";
+import { getOffres } from "../../../backend.mjs";
+
+const rawOffres = await getOffres();
+const offres = Array.isArray(rawOffres) ? rawOffres : rawOffres?.data ?? [];
+---
+
+<Layout titre="Offres">
+    <section
+        class="mb-6 grid gap-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm"
+    >
+        <div class="grid gap-4 md:grid-cols-3">
+            <label class="text-xl font-bold text-slate-700"> Filtres</label>
+        </div>
+        <div class="grid gap-4 md:grid-cols-3">
+            <label class="text-sm font-medium text-slate-700">
+                Prix min
+                <input
+                    id="filter-price-min"
+                    type="number"
+                    min="0"
+                    step="1"
+                    placeholder="Ex: 500"
+                    class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                />
+            </label>
+            <label class="text-sm font-medium text-slate-700">
+                Prix max
+                <input
+                    id="filter-price-max"
+                    type="number"
+                    min="0"
+                    step="1"
+                    placeholder="Ex: 1500"
+                    class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                />
+            </label>
+            <label class="text-sm font-medium text-slate-700">
+                Ville
+                <input
+                    id="filter-ville"
+                    type="text"
+                    placeholder="Ex: Nantes"
+                    class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                />
+            </label>
+        </div>
+        <div class="grid gap-4 md:grid-cols-3">
+            <label class="text-sm font-medium text-slate-700">
+                Chambres min
+                <input
+                    id="filter-chambres-min"
+                    type="number"
+                    min="0"
+                    step="1"
+                    placeholder="Ex: 2"
+                    class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                />
+            </label>
+            <label class="text-sm font-medium text-slate-700">
+                Salles de bain min
+                <input
+                    id="filter-sdb-min"
+                    type="number"
+                    min="0"
+                    step="1"
+                    placeholder="Ex: 1"
+                    class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                />
+            </label>
+            <div class="flex items-end gap-3">
+                <button
+                    id="filter-apply"
+                    class="rounded-lg bg-slate-900 px-4 py-2 text-white"
+                >
+                    Appliquer les filtres
+                </button>
+                <button
+                    id="favori-button"
+                    class="rounded-lg bg-slate-600 px-4 py-2 text-white"
+                >
+                    Afficher les favoris
+                </button>
+            </div>
+        </div>
+    </section>
+    <div class="offres-grid">
+        {
+            offres.map((offre) => (
+                <div
+                    class="offre"
+                    data-favori={offre.favori.toString()}
+                    data-prix={offre.maison_prix ?? 0}
+                    data-chambres={offre.chambres_nombre ?? 0}
+                    data-sdb={offre.nombre_SdB ?? 0}
+                    data-ville={(
+                        offre.maison_ville ??
+                        offre.maison_adresse ??
+                        ""
+                    ).toString()}
+                >
+                    <OffresCard offre={offre} />
+                </div>
+            ))
+        }
+    </div>
+
+    <script>
+        const button = document.getElementById("favori-button");
+        const grid = document.querySelector(".offres-grid");
+        const priceMinInput = document.getElementById("filter-price-min");
+        const priceMaxInput = document.getElementById("filter-price-max");
+        const chambresMinInput = document.getElementById("filter-chambres-min");
+        const sdbMinInput = document.getElementById("filter-sdb-min");
+        const villeInput = document.getElementById("filter-ville");
+        const applyButton = document.getElementById("filter-apply");
+        let showOnlyFavorites = false;
+
+        const toNumber = (value) => {
+            const trimmed = value?.trim();
+            if (!trimmed) return null;
+            const parsed = Number(trimmed);
+            return Number.isFinite(parsed) ? parsed : null;
+        };
+
+        const applyFilters = () => {
+            const minPrice = toNumber(priceMinInput?.value);
+            const maxPrice = toNumber(priceMaxInput?.value);
+            const minChambres = toNumber(chambresMinInput?.value);
+            const minSdb = toNumber(sdbMinInput?.value);
+            const villeQuery = (villeInput?.value || "").trim().toLowerCase();
+
+            document.querySelectorAll(".offre").forEach((offreCard) => {
+                const price = Number(offreCard.dataset.prix || 0);
+                const chambres = Number(offreCard.dataset.chambres || 0);
+                const sdb = Number(offreCard.dataset.sdb || 0);
+                const ville = (offreCard.dataset.ville || "").toLowerCase();
+                const isFavori = offreCard.dataset.favori === "true";
+
+                let visible = true;
+                if (showOnlyFavorites && !isFavori) visible = false;
+                if (minPrice !== null && price < minPrice) visible = false;
+                if (maxPrice !== null && price > maxPrice) visible = false;
+                if (minChambres !== null && chambres < minChambres) visible = false;
+                if (minSdb !== null && sdb < minSdb) visible = false;
+                if (villeQuery && !ville.includes(villeQuery)) visible = false;
+
+                offreCard.style.display = visible ? "block" : "none";
+            });
+
+            if (button) {
+                button.textContent = showOnlyFavorites
+                    ? "Afficher tout"
+                    : "Afficher les favoris";
+            }
+        };
+
+        grid?.addEventListener("click", (event) => {
+            const target = event.target;
+            if (!(target instanceof Element)) return;
+
+            const toggle = target.closest(".favori-toggle");
+            if (!toggle) return;
+
+            const isFavori = toggle.getAttribute("data-favori") === "true";
+            const nextValue = !isFavori;
+
+            toggle.setAttribute("data-favori", nextValue ? "true" : "false");
+            toggle.setAttribute("aria-pressed", nextValue ? "true" : "false");
+            toggle.classList.toggle("is-fav", nextValue);
+            toggle.textContent = nextValue ? "Favori" : "Ajouter";
+
+            const cardWrapper = toggle.closest(".offre");
+            if (cardWrapper) {
+                cardWrapper.dataset.favori = nextValue ? "true" : "false";
+                applyFilters();
+            }
+        });
+
+        button?.addEventListener("click", () => {
+            showOnlyFavorites = !showOnlyFavorites;
+            applyFilters();
+        });
+
+        applyButton?.addEventListener("click", applyFilters);
+
+        applyFilters();
+    </script>
+</Layout>
