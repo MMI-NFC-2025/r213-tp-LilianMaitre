@@ -1,6 +1,6 @@
 ---
-import { getOffre } from '../../backend.js';
-import Layout  from '../../layouts/Layout';
+import { getOffre } from '../../../backend.mjs';
+import Layout  from '../../layouts/Layout.astro';
 
 const { id } = Astro.params;
 const offre = await getOffre(id);
