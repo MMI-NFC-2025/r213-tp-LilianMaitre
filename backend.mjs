@@ -1,6 +1,4 @@
-
 import PocketBase from 'pocketbase';
-
 const db = new PocketBase('http://127.0.0.1:8090');
 
 export async function getOffres() {
@@ -155,5 +153,21 @@ export async function byPrix(minPrix, maxPrix) {
     } catch (error) {
         console.log("Erreur filtre prix", error);
         return null;
+    }
+}
+
+export async function addOffre(house) {
+    try {
+        await db.collection('maison').create(house);
+        return {
+            success: true,
+            message: 'Offre ajoutée avec succès'
+        };
+    } catch (error) {
+        console.log('Une erreur est survenue en ajoutant la maison', error);
+        return {
+            success: false,
+            message: 'Une erreur est survenue en ajoutant la maison'
+        };
     }
 }
