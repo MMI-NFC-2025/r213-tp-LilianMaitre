@@ -80,8 +80,8 @@ const images = Array.isArray(offre.maison_images)
 				{offre.favori ? "Favori" : "Ajouter"}
 			</button>
 		</div>
+		<a href={`/offres/${offre.id}`} class="voir-plus-btn">Voir plus</a>
 	</div>
-	<a href={`/offres/${offre.id}`}>Voir plus</a>
 </article>
 
 <style>
@@ -246,6 +246,29 @@ const images = Array.isArray(offre.maison_images)
 		background: #9a8c98;
 		border-color: #9a8c98;
 		color: #ffffff;
+	}
+
+
+	.voir-plus-btn {
+		display: inline-flex;
+		align-self: flex-start;
+		margin: 0.5rem 0.5rem 0 0.1rem;
+		padding: 0.22rem 0.8rem;
+		background: #4a4e69;
+		color: #fff;
+		border-radius: 6px;
+		font-weight: 500;
+		font-size: 0.82rem;
+		text-decoration: none;
+		box-shadow: 0 1px 4px rgba(34, 34, 59, 0.06);
+		transition:
+			background 0.2s,
+			transform 0.15s;
+	}
+	.voir-plus-btn:hover {
+		background: #9a8c98;
+		color: #fff;
+		transform: translateY(-2px) scale(1.03);
 	}
 </style>
 

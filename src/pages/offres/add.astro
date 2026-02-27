@@ -10,28 +10,160 @@ if (Astro.request.method === "POST") {
 ---
 
 <Layout titre="Ajouter une offre">
-    <h1 class="text-lg">Ajouter une offre</h1>
-    <form action="/offres/add" method="POST" enctype="multipart/form-data">
-        <input
-            type="text"
-            name="nomMaison"
-            placeholder="Nom de la maison"
-            required
-            class="w-full mt-2 p-2 border border-gray-300 rounded-md"
-        />
-        <input type="number" name="prix" placeholder="Prix" />
-        <input
-            type="number"
-            name="nbSdb"
-            placeholder="Nombre de salles de bain"
-        />
-        <input
-            type="number"
-            name="nbChambres"
-            placeholder="Nombre de chambres"
-        />
-        <input type="number" name="surface" placeholder="Superficie" />
-        <input type="file" name="image" />
-        <button type="submit">Ajouter</button>
-    </form>
+    <div class="ajout-offre-container">
+        <h1 class="ajout-offre-title">Ajouter une offre</h1>
+        {message && <div class="ajout-message">{message}</div>}
+        <form
+            action="/offres/add"
+            method="POST"
+            enctype="multipart/form-data"
+            class="ajout-offre-form"
+        >
+            <div class="ajout-form-group">
+                <label for="nomMaison">Nom de la maison</label>
+                <input
+                    type="text"
+                    id="nomMaison"
+                    name="nomMaison"
+                    placeholder="Nom de la maison"
+                    required
+                />
+            </div>
+            <div class="ajout-form-row">
+                <div class="ajout-form-group">
+                    <label for="prix">Prix (€)</label>
+                    <input
+                        type="number"
+                        id="prix"
+                        name="prix"
+                        placeholder="Prix"
+                        required
+                    />
+                </div>
+                <div class="ajout-form-group">
+                    <label for="nbSdb">Salles de bain</label>
+                    <input
+                        type="number"
+                        id="nbSdb"
+                        name="nbSdb"
+                        placeholder="Nb sdb"
+                        min="0"
+                        required
+                    />
+                </div>
+                <div class="ajout-form-group">
+                    <label for="nbChambres">Chambres</label>
+                    <input
+                        type="number"
+                        id="nbChambres"
+                        name="nbChambres"
+                        placeholder="Nb chambres"
+                        min="0"
+                        required
+                    />
+                </div>
+                <div class="ajout-form-group">
+                    <label for="surface">Superficie (m²)</label>
+                    <input
+                        type="number"
+                        id="surface"
+                        name="surface"
+                        placeholder="Superficie"
+                        min="0"
+                        required
+                    />
+                </div>
+            </div>
+            <div class="ajout-form-group">
+                <label for="image">Image</label>
+                <input type="file" id="image" name="image" accept="image/*" />
+            </div>
+            <button type="submit" class="ajout-btn">Ajouter</button>
+        </form>
+    </div>
+    <style>
+        .ajout-offre-container {
+            max-width: 540px;
+            margin: 2.5rem auto 0 auto;
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: 0 4px 24px rgba(34, 34, 59, 0.07);
+            padding: 2.2rem 2.2rem 1.5rem 2.2rem;
+        }
+        .ajout-offre-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #22223b;
+            margin-bottom: 1.2rem;
+            text-align: center;
+        }
+        .ajout-message {
+            background: #e0ffe0;
+            color: #226622;
+            border-radius: 6px;
+            padding: 0.7rem 1rem;
+            margin-bottom: 1.2rem;
+            text-align: center;
+            font-weight: 500;
+        }
+        .ajout-offre-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.1rem;
+        }
+        .ajout-form-row {
+            display: flex;
+            gap: 1.1rem;
+            flex-wrap: wrap;
+        }
+        .ajout-form-group {
+            display: flex;
+            flex-direction: column;
+            flex: 1 1 120px;
+            min-width: 120px;
+            gap: 0.3rem;
+        }
+        .ajout-form-group label {
+            font-size: 0.97rem;
+            color: #4a4e69;
+            font-weight: 500;
+            margin-bottom: 0.1rem;
+        }
+        .ajout-form-group input[type="text"],
+        .ajout-form-group input[type="number"] {
+            padding: 0.45rem 0.7rem;
+            border: 1px solid #d4cfc7;
+            border-radius: 6px;
+            font-size: 1rem;
+            background: #f7f7fa;
+            transition: border 0.2s;
+        }
+        .ajout-form-group input[type="text"]:focus,
+        .ajout-form-group input[type="number"]:focus {
+            border: 1.5px solid #4a4e69;
+            outline: none;
+        }
+        .ajout-form-group input[type="file"] {
+            margin-top: 0.2rem;
+        }
+        .ajout-btn {
+            margin-top: 1.2rem;
+            background: #4a4e69;
+            color: #fff;
+            border: none;
+            border-radius: 7px;
+            padding: 0.6rem 1.5rem;
+            font-size: 1.08rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(34, 34, 59, 0.07);
+            transition:
+                background 0.2s,
+                transform 0.15s;
+        }
+        .ajout-btn:hover {
+            background: #9a8c98;
+            transform: translateY(-2px) scale(1.04);
+        }
+    </style>
 </Layout>
