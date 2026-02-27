@@ -2,29 +2,28 @@
 import "../../styles/global.css";
 import Layout from "../../layouts/Layout.astro";
 import OffresCard from "../../components/OffresCard.astro";
-import { getOffres } from "../../../backend.mjs";
-
-const rawOffres = await getOffres();
-const offres = Array.isArray(rawOffres) ? rawOffres : (rawOffres?.data ?? []);
+import { getOffres, filterByPrix } from "../../../backend.mjs";
 
 let message = "";
+let offres = [];
+
 if (Astro.request.method === "POST") {
     const data = await Astro.request.formData();
     const minPrix = parseInt(data.get("minPrix"));
     const maxPrix = parseInt(data.get("maxPrix"));
 
-    if (minPrix > 0 && maxPrix > 0 && maxPrix > minPrix) {
-        Offres = await filterByPrix(minPrix, maxPrix);
-        if (Offres.length === 0) {
+    if (minPrix >= 0 && maxPrix > minPrix) {
+        offres = await filterByPrix(minPrix, maxPrix);
+        if (offres.length === 0) {
             message = `Pas d'offres entre ${minPrix}€ et ${maxPrix}€`;
-        } else {
-            message = `Liste des offres entre ${minPrix}€ et ${maxPrix}€`;
         }
     } else {
-        message = "Veuillez entrer des valeurs valides pour le prix.";
+        message = "Veuillez entrer des valeurs valides.";
+        offres = await getOffres();
     }
 } else {
-    Offres = await getOffres();
+    
+    offres = await getOffres();
 }
 ---
 
