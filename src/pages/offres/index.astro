@@ -2,240 +2,89 @@
 import "../../styles/global.css";
 import Layout from "../../layouts/Layout.astro";
 import OffresCard from "../../components/OffresCard.astro";
-import { getOffres, filterByPrix } from "../../../backend.mjs";
+import { getOffres } from "../../../backend.mjs";
 
+
+const toutesLesOffres = await getOffres();
+let offres = toutesLesOffres;
 let message = "";
-let offres = [];
 
 if (Astro.request.method === "POST") {
     const data = await Astro.request.formData();
     const minPrix = parseInt(data.get("minPrix"));
     const maxPrix = parseInt(data.get("maxPrix"));
 
-    if (minPrix >= 0 && maxPrix > minPrix) {
-        offres = await filterByPrix(minPrix, maxPrix);
-        if (offres.length === 0) {
-            message = `Pas d'offres entre ${minPrix}€ et ${maxPrix}€`;
-        }
+    if (isNaN(minPrix) || isNaN(maxPrix)) {
+        message = "Veuillez entrer des prix valides.";
+    } else if (maxPrix <= minPrix) {
+        message = "Le prix max doit être supérieur au prix min.";
     } else {
-        message = "Veuillez entrer des valeurs valides.";
-        offres = await getOffres();
+        offres = toutesLesOffres.filter((maison) => {
+            return maison.prix >= minPrix && maison.prix <= maxPrix;
+        });
+        message = `Résultat : ${offres.length} offre(s) trouvée(s).`;
     }
-} else {
-    
-    offres = await getOffres();
 }
 ---
 
 <Layout titre="Offres">
-    <a
-        href="/offres/add"
-        class="inline-block mb-4 p-2 bg-red-500 hover:bg-red-700 text-white rounded shadow"
-    >
-        Créer une nouvelle offre
-    </a>
-    <form action="/offres" method="POST">
-        <input type="number" name="minPrix" placeholder="Prix minimum" />
-        <input type="number" name="maxPrix" placeholder="Prix maximum" />
-        <input type="submit" value="Filtrer par prix" />
-    </form>
-    <section
-        class="mb-6 grid gap-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm"
-    >
-        <div class="grid gap-4 md:grid-cols-3">
-            <label class="text-xl font-bold text-slate-700"> Filtres</label>
-        </div>
-        <div class="grid gap-4 md:grid-cols-3">
-            <label class="text-sm font-medium text-slate-700">
-                Prix min
-                <input
-                    id="filter-price-min"
-                    type="number"
-                    min="0"
-                    step="1"
-                    placeholder="Ex: 500"
-                    class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
-                />
-            </label>
-            <label class="text-sm font-medium text-slate-700">
-                Prix max
-                <input
-                    id="filter-price-max"
-                    type="number"
-                    min="0"
-                    step="1"
-                    placeholder="Ex: 1500"
-                    class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
-                />
-            </label>
-            <label class="text-sm font-medium text-slate-700">
-                Ville
-                <input
-                    id="filter-ville"
-                    type="text"
-                    placeholder="Ex: Nantes"
-                    class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
-                />
-            </label>
-        </div>
-        <div class="grid gap-4 md:grid-cols-3">
-            <label class="text-sm font-medium text-slate-700">
-                Chambres min
-                <input
-                    id="filter-chambres-min"
-                    type="number"
-                    min="0"
-                    step="1"
-                    placeholder="Ex: 2"
-                    class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
-                />
-            </label>
-            <label class="text-sm font-medium text-slate-700">
-                Salles de bain min
-                <input
-                    id="filter-sdb-min"
-                    type="number"
-                    min="0"
-                    step="1"
-                    placeholder="Ex: 1"
-                    class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
-                />
-            </label>
-            <div class="flex items-end gap-3">
-                <button
-                    id="filter-apply"
-                    class="rounded-lg bg-slate-900 px-4 py-2 text-white"
-                >
-                    Appliquer les filtres
-                </button>
-                <button
-                    id="favori-button"
-                    class="rounded-lg bg-slate-600 px-4 py-2 text-white"
-                >
-                    Afficher les favoris
-                </button>
-            </div>
-        </div>
-    </section>
-    <a
-        href="/offres/surface/150"
-        class="mb-6 inline-flex items-center gap-2 text-sm font-semibold text-slate-700 hover:text-slate-900"
-    >
-        Voir les maisons avec une surface &gt; 150 m²
-    </a>
+    <div class="p-4">
+        <a
+            href="/offres/add"
+            class="inline-block mb-6 p-2 bg-red-500 hover:bg-red-700 text-white rounded shadow font-bold"
+        >
+            Créer une nouvelle offre
+        </a>
 
-    <a
-        href="/offres/prix/450000"
-        class="mb-6 inline-flex items-center gap-2 text-sm font-semibold text-slate-700 hover:text-slate-900"
-    >
-        Voir les maisons avec un prix &lt; 450 000$/mois
-    </a>
+        <section
+            class="mb-6 p-4 rounded-xl border border-slate-200 bg-white shadow-sm"
+        >
+            <h2 class="text-xl font-bold text-slate-700 mb-4">Filtres</h2>
 
-    <a href="/offres/prix/150000/300000">
-        Voir les maisons entre 150 000 € et 300 000 €
-    </a>
-
-    <div class="offres-grid">
-        {
-            offres.map((offre) => (
-                <div
-                    class="offre"
-                    data-favori={offre.favori.toString()}
-                    data-prix={offre.maison_prix ?? 0}
-                    data-chambres={offre.chambres_nombre ?? 0}
-                    data-sdb={offre.nombre_SdB ?? 0}
-                    data-ville={(
-                        offre.maison_ville ??
-                        offre.maison_adresse ??
-                        ""
-                    ).toString()}
-                >
-                    <OffresCard offre={offre} />
+            <form method="POST" class="flex flex-wrap gap-4 items-end">
+                <div>
+                    <label
+                        for="minPrix"
+                        class="block text-sm font-medium text-slate-700"
+                        >Prix minimum (€)</label
+                    >
+                    <input
+                        type="number"
+                        name="minPrix"
+                        id="minPrix"
+                        placeholder="Ex: 500"
+                        min="0"
+                        class="mt-1 border border-slate-300 p-2 rounded-lg text-sm"
+                    />
                 </div>
-            ))
-        }
+                <div>
+                    <label
+                        for="maxPrix"
+                        class="block text-sm font-medium text-slate-700"
+                        >Prix maximum (€)</label
+                    >
+                    <input
+                        type="number"
+                        name="maxPrix"
+                        id="maxPrix"
+                        placeholder="Ex: 2000"
+                        min="0"
+                        class="mt-1 border border-slate-300 p-2 rounded-lg text-sm"
+                    />
+                </div>
+                <button
+                    type="submit"
+                    class="bg-red-500 text-white px-4 py-2 rounded-lg font-bold hover:bg-red-600 transition-colors"
+                >
+                    Filtrer par prix
+                </button>
+            </form>
+
+            {message && <p class="mt-4 text-blue-600 font-medium">{message}</p>}
+        </section>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {offres.map((offre) => <OffresCard offre={offre} />)}
+        </div>
     </div>
-
-    <script>
-        const button = document.getElementById("favori-button");
-        const grid = document.querySelector(".offres-grid");
-        const priceMinInput = document.getElementById("filter-price-min");
-        const priceMaxInput = document.getElementById("filter-price-max");
-        const chambresMinInput = document.getElementById("filter-chambres-min");
-        const sdbMinInput = document.getElementById("filter-sdb-min");
-        const villeInput = document.getElementById("filter-ville");
-        const applyButton = document.getElementById("filter-apply");
-        let showOnlyFavorites = false;
-
-        const toNumber = (value) => {
-            const trimmed = value?.trim();
-            if (!trimmed) return null;
-            const parsed = Number(trimmed);
-            return Number.isFinite(parsed) ? parsed : null;
-        };
-
-        const applyFilters = () => {
-            const minPrice = toNumber(priceMinInput?.value);
-            const maxPrice = toNumber(priceMaxInput?.value);
-            const minChambres = toNumber(chambresMinInput?.value);
-            const minSdb = toNumber(sdbMinInput?.value);
-            const villeQuery = (villeInput?.value || "").trim().toLowerCase();
-
-            document.querySelectorAll(".offre").forEach((offreCard) => {
-                const price = Number(offreCard.dataset.prix || 0);
-                const chambres = Number(offreCard.dataset.chambres || 0);
-                const sdb = Number(offreCard.dataset.sdb || 0);
-                const ville = (offreCard.dataset.ville || "").toLowerCase();
-                const isFavori = offreCard.dataset.favori === "true";
-
-                let visible = true;
-                if (showOnlyFavorites && !isFavori) visible = false;
-                if (minPrice !== null && price < minPrice) visible = false;
-                if (maxPrice !== null && price > maxPrice) visible = false;
-                if (minChambres !== null && chambres < minChambres)
-                    visible = false;
-                if (minSdb !== null && sdb < minSdb) visible = false;
-                if (villeQuery && !ville.includes(villeQuery)) visible = false;
-
-                offreCard.style.display = visible ? "block" : "none";
-            });
-
-            if (button) {
-                button.textContent = showOnlyFavorites
-                    ? "Afficher tout"
-                    : "Afficher les favoris";
-            }
-        };
-
-        grid?.addEventListener("click", (event) => {
-            const target = event.target;
-            if (!(target instanceof Element)) return;
-
-            const toggle = target.closest(".favori-toggle");
-            if (!toggle) return;
-
-            const isFavori = toggle.getAttribute("data-favori") === "true";
-            const nextValue = !isFavori;
-
-            toggle.setAttribute("data-favori", nextValue ? "true" : "false");
-            toggle.setAttribute("aria-pressed", nextValue ? "true" : "false");
-            toggle.classList.toggle("is-fav", nextValue);
-            toggle.textContent = nextValue ? "Favori" : "Ajouter";
-
-            const cardWrapper = toggle.closest(".offre");
-            if (cardWrapper) {
-                cardWrapper.dataset.favori = nextValue ? "true" : "false";
-                applyFilters();
-            }
-        });
-
-        button?.addEventListener("click", () => {
-            showOnlyFavorites = !showOnlyFavorites;
-            applyFilters();
-        });
-
-        applyButton?.addEventListener("click", applyFilters);
-
-        applyFilters();
-    </script>
 </Layout>
