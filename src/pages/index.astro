@@ -4,8 +4,254 @@ import Layout from "../layouts/Layout.astro";
 ---
 
 <Layout titre="Accueil">
-	<section class="home-hero">
-		<h1>Accueil</h1>
-		<p>Bienvenue sur la page d'accueil.</p>
+	<section class="hero">
+		<div class="hero-text">
+			<p class="eyebrow">Location & Vente</p>
+			<h1>
+				Trouvez votre prochaine maison
+				<span class="accent">en toute simplicité.</span>
+			</h1>
+			<p class="lede">
+				Explorez nos offres triées sur le volet, filtrez par prix,
+				surface ou favoris, et contactez nos agents en un clic.
+			</p>
+			<div class="hero-actions">
+				<a class="btn primary" href="/offres">Voir les offres</a>
+				<a class="btn ghost" href="/offres/add">Publier une offre</a>
+			</div>
+		</div>
+		<div class="hero-card">
+			<div class="hero-card-price">1 250 € / mois</div>
+			<h3>Villa lumineuse</h3>
+			<p>Montpellier · 120 m² · 3 ch · 2 sdb</p>
+			<div class="hero-badges">
+				<span>Favori</span>
+				<span>Visite 360°</span>
+			</div>
+		</div>
+	</section>
+
+	<section class="feature-grid">
+		<div class="feature">
+			<h3>Filtres rapides</h3>
+			<div>
+				<h3>Prêt à démarrer ?</h3>
+				<p>
+					Parcourez les offres disponibles ou publiez une nouvelle
+					annonce.
+				</p>
+			</div>
+		</div>
+		<div class="feature">
+			<a class="btn ghost" href="/offres/add">Publier une offre</a>
+			<p>Des conseillers locaux pour organiser vos visites rapidement.</p>
+		</div>
+		<div class="feature">
+			<h3>Favoris synchronisés</h3>
+			<p>
+				Ajoutez en favori et retrouvez-les d’un clic sur la page Offres.
+			</p>
+		</div>
+	</section>
+
+	<section class="cta">
+		<div>
+			<h3>Prêt à démarrer ?</h3>
+			<p>
+				Parcourez les offres disponibles ou ajoutez un agent pour vous
+				accompagner.
+			</p>
+		</div>
+		<div class="cta-actions">
+			<a class="btn primary" href="/offres">Découvrir les offres</a>
+			<a class="btn ghost" href="/agents/add">Ajouter un agent</a>
+		</div>
 	</section>
 </Layout>
+
+<style>
+	.hero {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+		gap: 1.8rem;
+		align-items: center;
+		padding: 2rem 0 1rem;
+	}
+
+	.hero-text h1 {
+		margin: 0.4rem 0 0.6rem;
+		font-size: clamp(2rem, 4vw, 2.6rem);
+		color: #111827;
+		line-height: 1.2;
+	}
+
+	.hero-text .accent {
+		display: block;
+		color: #4a4e69;
+	}
+
+	.eyebrow {
+		margin: 0;
+		text-transform: uppercase;
+		letter-spacing: 0.08em;
+		font-weight: 700;
+		color: #9a8c98;
+		font-size: 0.9rem;
+	}
+
+	.lede {
+		margin: 0 0 1.2rem;
+		color: #4b5563;
+		line-height: 1.6;
+		max-width: 48ch;
+	}
+
+	.hero-actions {
+		display: flex;
+		gap: 0.8rem;
+		flex-wrap: wrap;
+	}
+
+	.hero-card {
+		background: linear-gradient(145deg, #f5f3ff, #e5e7eb);
+		border-radius: 16px;
+		padding: 1.4rem;
+		box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+		border: 1px solid #e2e8f0;
+	}
+
+	.hero-card h3 {
+		margin: 0.4rem 0 0.2rem;
+		color: #111827;
+	}
+
+	.hero-card p {
+		margin: 0;
+		color: #4b5563;
+	}
+
+	.hero-card-price {
+		display: inline-flex;
+		padding: 0.35rem 0.75rem;
+		background: #111827;
+		color: #fff;
+		border-radius: 999px;
+		font-weight: 700;
+		font-size: 0.95rem;
+	}
+
+	.hero-badges {
+		display: flex;
+		gap: 0.5rem;
+		margin-top: 0.6rem;
+		flex-wrap: wrap;
+	}
+
+	.hero-badges span {
+		background: #fff;
+		color: #111827;
+		padding: 0.25rem 0.6rem;
+		border-radius: 10px;
+		border: 1px solid #e5e7eb;
+		font-size: 0.9rem;
+	}
+
+	.feature-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+		gap: 1rem;
+		margin: 2rem 0;
+	}
+
+	.feature {
+		background: #fff;
+		border: 1px solid #e5e7eb;
+		border-radius: 12px;
+		padding: 1.1rem 1.2rem;
+		box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+	}
+
+	.feature h3 {
+		margin: 0 0 0.35rem;
+		color: #111827;
+	}
+
+	.feature p {
+		margin: 0;
+		color: #4b5563;
+		line-height: 1.5;
+	}
+
+	.cta {
+		margin: 2rem 0 1rem;
+		background: linear-gradient(135deg, #4a4e69, #9a8c98);
+		border-radius: 14px;
+		color: #fff;
+		padding: 1.4rem 1.6rem;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1rem;
+		flex-wrap: wrap;
+	}
+
+	.cta h3 {
+		margin: 0 0 0.25rem;
+		font-size: 1.2rem;
+	}
+
+	.cta p {
+		margin: 0;
+		opacity: 0.9;
+	}
+
+	.cta-actions {
+		display: flex;
+		gap: 0.6rem;
+		flex-wrap: wrap;
+	}
+
+	.btn {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		padding: 0.55rem 1rem;
+		border-radius: 10px;
+		text-decoration: none;
+		font-weight: 700;
+		transition:
+			transform 0.15s,
+			background 0.2s,
+			color 0.2s;
+		border: 1px solid transparent;
+	}
+
+	.btn.primary {
+		background: #22223b;
+		color: #f2e9e4;
+		border-color: #22223b;
+	}
+
+	.btn.primary:hover {
+		background: #111827;
+		transform: translateY(-1px);
+	}
+
+	.btn.ghost {
+		background: #ffffff;
+		color: #111827;
+		border-color: #e5e7eb;
+	}
+
+	.btn.ghost:hover {
+		transform: translateY(-1px);
+		border-color: #d1d5db;
+	}
+
+	@media (max-width: 640px) {
+		.cta {
+			flex-direction: column;
+			align-items: flex-start;
+		}
+	}
+</style>
