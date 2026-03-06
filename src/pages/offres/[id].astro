@@ -1,15 +1,359 @@
 ---
-import { getOffre } from '../../../backend.mjs';
-import Layout  from '../../layouts/Layout.astro';
+import { getOffre } from "../../../backend.mjs";
+import Layout from "../../layouts/Layout.astro";
+import PbImage from "../../components/PbImage.astro";
 
 const { id } = Astro.params;
 const offre = await getOffre(id);
+
+const images = Array.isArray(offre?.maison_images)
+    ? offre.maison_images
+    : offre?.maison_images
+      ? [offre.maison_images]
+      : [];
+
+if (!offre) {
+    throw new Error("Offre introuvable");
+}
 ---
 
-<Layout titre={offre.nomMaison}>
-    <h2>{offre.nomMaison}</h2>
-    <ul>
-        <li>{offre.adresse}</li>
-        ...
-    </ul>
+<Layout titre={offre.maison_name ?? offre.nomMaison ?? "Offre"}>
+    <section class="offre-detail">
+        <header class="offre-head">
+            <div>
+                <p class="offre-badge">Disponible</p>
+                <h1 class="offre-title">
+                    {offre.maison_name ?? offre.nomMaison ?? "Offre"}
+                </h1>
+                <p class="offre-address">
+                    {offre.maison_adresse ?? offre.adresse}
+                </p>
+            </div>
+            <div class="offre-price">
+                {offre.maison_prix ?? offre.prix} / mois
+            </div>
+        </header>
+
+        {
+            images.length > 0 ? (
+                <div class="offre-carousel" data-carousel>
+                    <div class="offre-carousel-track">
+                        {images.map((img, idx) => (
+                            <div
+                                class:list={[
+                                    "offre-carousel-slide",
+                                    { "is-active": idx === 0 },
+                                ]}
+                                data-carousel-slide
+                                aria-hidden={idx === 0 ? "false" : "true"}
+                            >
+                                <PbImage record={offre} recordImage={img} />
+                            </div>
+                        ))}
+                    </div>
+                    <button
+                        class="offre-carousel-btn prev"
+                        type="button"
+                        data-carousel-prev
+                        aria-label="Image precedente"
+                    >
+                        &lt;
+                    </button>
+                    <button
+                        class="offre-carousel-btn next"
+                        type="button"
+                        data-carousel-next
+                        aria-label="Image suivante"
+                    >
+                        &gt;
+                    </button>
+                    {images.length > 1 && (
+                        <div
+                            class="offre-carousel-counter"
+                            data-carousel-counter
+                        >
+                            1 / {images.length}
+                        </div>
+                    )}
+                </div>
+            ) : (
+                <div class="offre-gallery empty">Aucune image disponible</div>
+            )
+        }
+
+        <div class="offre-grid">
+            <div class="offre-card">
+                <h3>Caracteristiques</h3>
+                <ul class="specs">
+                    <li>
+                        <span>Surface</span><strong
+                            >{offre.maison_surface ?? offre.surface} m2</strong
+                        >
+                    </li>
+                    <li>
+                        <span>Chambres</span><strong
+                            >{offre.chambres_nombre ?? offre.chambres}</strong
+                        >
+                    </li>
+                    <li>
+                        <span>Salles de bain</span><strong
+                            >{offre.nombre_SdB ?? offre.sdb}</strong
+                        >
+                    </li>
+                </ul>
+            </div>
+
+            <div class="offre-card">
+                <h3>Description</h3>
+                <p class="offre-desc">
+                    {offre.description ?? "Maison disponible a la location."}
+                </p>
+            </div>
+        </div>
+    </section>
 </Layout>
+
+<style>
+    .offre-detail {
+        max-width: 900px;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .offre-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: 1.25rem 1.5rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        background: #fff;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+    }
+
+    .offre-title {
+        margin: 0.2rem 0;
+        font-size: 1.6rem;
+        color: #1f2937;
+    }
+
+    .offre-address {
+        margin: 0;
+        color: #4b5563;
+        font-size: 0.95rem;
+    }
+
+    .offre-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        background: #eef2ff;
+        color: #4338ca;
+        padding: 0.25rem 0.65rem;
+        border-radius: 999px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        margin: 0;
+    }
+
+    .offre-price {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #dc2626;
+        white-space: nowrap;
+    }
+
+    .offre-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 1rem;
+    }
+
+    .offre-carousel {
+        position: relative;
+        border-radius: 14px;
+        overflow: hidden;
+        border: 1px solid #e2e8f0;
+        background: #f8fafc;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+    }
+
+    .offre-carousel-track {
+        width: 100%;
+        height: 100%;
+    }
+
+    .offre-carousel-slide {
+        display: none;
+    }
+
+    .offre-carousel-slide.is-active {
+        display: block;
+    }
+
+    .offre-carousel img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .offre-carousel-btn {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        border: none;
+        background: rgba(31, 41, 55, 0.7);
+        color: #fff;
+        width: 2.4rem;
+        height: 2.4rem;
+        border-radius: 999px;
+        cursor: pointer;
+        display: grid;
+        place-items: center;
+        font-size: 1.1rem;
+    }
+
+    .offre-carousel-btn.prev {
+        left: 0.75rem;
+    }
+
+    .offre-carousel-btn.next {
+        right: 0.75rem;
+    }
+
+    .offre-carousel-counter {
+        position: absolute;
+        bottom: 0.6rem;
+        right: 0.75rem;
+        background: rgba(31, 41, 55, 0.75);
+        color: #fff;
+        padding: 0.2rem 0.6rem;
+        border-radius: 999px;
+        font-size: 0.85rem;
+    }
+
+    .offre-gallery.empty {
+        border: 1px dashed #e2e8f0;
+        border-radius: 12px;
+        padding: 1rem;
+        text-align: center;
+        color: #6b7280;
+    }
+
+    .offre-card {
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 14px;
+        padding: 1.1rem 1.2rem;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+        display: flex;
+        flex-direction: column;
+        gap: 0.6rem;
+    }
+
+    .offre-card h3 {
+        margin: 0;
+        font-size: 1.05rem;
+        color: #1f2937;
+    }
+
+    .specs {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .specs li {
+        display: flex;
+        justify-content: space-between;
+        color: #4b5563;
+        font-size: 0.95rem;
+        border-bottom: 1px solid #f3f4f6;
+        padding-bottom: 0.4rem;
+    }
+
+    .specs li:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+    }
+
+    .specs strong {
+        color: #111827;
+        font-weight: 700;
+    }
+
+    .offre-desc {
+        margin: 0;
+        color: #4b5563;
+        line-height: 1.5;
+        font-size: 0.96rem;
+    }
+
+    @media (max-width: 640px) {
+        .offre-head {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .offre-price {
+            align-self: flex-start;
+        }
+    }
+</style>
+
+<script>
+    const bootCarousel = () => {
+        const carousel = document.querySelector("[data-carousel]");
+        if (!carousel) return;
+
+        const slides = Array.from(
+            carousel.querySelectorAll("[data-carousel-slide]"),
+        );
+        const prev = carousel.querySelector("[data-carousel-prev]");
+        const next = carousel.querySelector("[data-carousel-next]");
+        const counter = carousel.querySelector("[data-carousel-counter]");
+
+        if (slides.length <= 1) {
+            carousel.classList.add("is-single");
+            if (counter) counter.style.display = "none";
+            if (prev) prev.style.display = "none";
+            if (next) next.style.display = "none";
+            return;
+        }
+
+        let index = slides.findIndex((s) => s.classList.contains("is-active"));
+        if (index < 0) index = 0;
+
+        const update = (nextIndex) => {
+            index = (nextIndex + slides.length) % slides.length;
+            slides.forEach((slide, i) => {
+                const active = i === index;
+                slide.classList.toggle("is-active", active);
+                slide.setAttribute("aria-hidden", active ? "false" : "true");
+            });
+            if (counter) {
+                counter.textContent = `${index + 1} / ${slides.length}`;
+            }
+        };
+
+        prev?.addEventListener("click", () => update(index - 1));
+        next?.addEventListener("click", () => update(index + 1));
+
+        update(index);
+    };
+
+    if (document.readyState === "loading") {
+        window.addEventListener("DOMContentLoaded", bootCarousel, {
+            once: true,
+        });
+    } else {
+        bootCarousel();
+    }
+</script>

@@ -140,7 +140,7 @@ export async function maisonfavoriagent(favori, agentId) {
 
 export async function getOffre(id) {
     try {
-        const data = await db.collection('maison').getOne(id);
+        const data = await db.collection('maisons').getOne(id);
         return data;
     } catch (error) {
         console.log('Une erreur est survenue en lisant la maison', error);
