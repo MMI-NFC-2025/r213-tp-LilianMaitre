@@ -4,10 +4,12 @@ import Layout from "../../layouts/Layout.astro";
 import OffresCard from "../../components/OffresCard.astro";
 import { getOffres } from "../../../backend.mjs";
 
-
-const toutesLesOffres = await getOffres();
+const offresResult = await getOffres();
+let message = offresResult
+    ? ""
+    : "Impossible de charger les offres pour le moment.";
+const toutesLesOffres = offresResult ?? [];
 let offres = toutesLesOffres;
-let message = "";
 
 if (Astro.request.method === "POST") {
     const data = await Astro.request.formData();
@@ -20,7 +22,9 @@ if (Astro.request.method === "POST") {
         message = "Le prix max doit être supérieur au prix min.";
     } else {
         offres = toutesLesOffres.filter((maison) => {
-            return maison.prix >= minPrix && maison.prix <= maxPrix;
+            return (
+                maison.maison_prix >= minPrix && maison.maison_prix <= maxPrix
+            );
         });
         message = `Résultat : ${offres.length} offre(s) trouvée(s).`;
     }
@@ -81,10 +85,61 @@ if (Astro.request.method === "POST") {
             </form>
 
             {message && <p class="mt-4 text-blue-600 font-medium">{message}</p>}
+
+            <button
+                id="toggle-favoris"
+                type="button"
+                class="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-300 text-slate-700 font-semibold hover:bg-slate-100 transition-colors"
+            >
+                Afficher uniquement les favoris
+            </button>
         </section>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div
+            class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+            data-offres-grid
+        >
             {offres.map((offre) => <OffresCard offre={offre} />)}
         </div>
     </div>
 </Layout>
+
+<script>
+    const bootFavorisFilter = () => {
+        const btn = document.querySelector("#toggle-favoris");
+        const grid = document.querySelector("[data-offres-grid]");
+        if (!btn || !grid) return;
+
+        let showOnlyFav = false;
+
+        const applyFilter = () => {
+            const cards = grid.querySelectorAll(".offre-card");
+            cards.forEach((card) => {
+                const isFav = card.dataset.favori === "true";
+                card.style.display = showOnlyFav && !isFav ? "none" : "";
+            });
+            btn.textContent = showOnlyFav
+                ? "Afficher toutes les offres"
+                : "Afficher uniquement les favoris";
+        };
+
+        btn.addEventListener("click", () => {
+            showOnlyFav = !showOnlyFav;
+            applyFilter();
+        });
+
+        document.addEventListener("favori-changed", () => {
+            applyFilter();
+        });
+
+        applyFilter();
+    };
+
+    if (document.readyState === "loading") {
+        window.addEventListener("DOMContentLoaded", bootFavorisFilter, {
+            once: true,
+        });
+    } else {
+        bootFavorisFilter();
+    }
+</script>

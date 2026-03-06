@@ -1,5 +1,10 @@
+// Authentification admin (super utilisateur) via l'API native PocketBase
+export async function superUserauth(login, mdp) {
+    return await db.admins.authWithPassword(login, mdp);
+}
 import PocketBase from 'pocketbase';
 const db = new PocketBase('http://127.0.0.1:8090');
+export const pb = db;
 
 export async function getOffres() {
     try {
@@ -170,4 +175,59 @@ export async function addOffre(house) {
             message: 'Une erreur est survenue en ajoutant la maison'
         };
     }
+}
+
+export async function addNewMaison(newmaison) {
+
+    await db.collection('maisons').create(newmaison);
+
+}
+
+export async function addNewAgent(newagent) {
+
+    await db.collection('Agent').create(newagent);
+
+}
+
+export async function DeleteMaisonById(id) {
+
+    await db.collection('maisons').delete(id);
+
+}
+
+export async function DeleteAgentById(id) {
+
+    await db.collection('Agent').delete(id);
+
+}
+
+export async function updateMaison(id, updatedData) {
+
+    await db.collection('maisons').update(id, updatedData);
+
+}
+
+export async function addUser(newUser) {
+    return await db.collection('user').create(newUser);
+}
+
+export async function addUsers(users) {
+    const created = [];
+    for (const user of users) {
+        created.push(await db.collection('user').create(user));
+    }
+    return created;
+}
+
+export async function addTwoUsers(userA, userB) {
+    return await addUsers([userA, userB]);
+}
+
+// Authentification utilisateur (compte standard)
+export async function Userauth(login, mdp) {
+    return await db.collection('users').authWithPassword(login, mdp);
+}
+
+export async function setFavori(house) {
+    await db.collection('maison').update(house.id, { favori: !house.favori });
 }
