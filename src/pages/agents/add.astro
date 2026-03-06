@@ -1,0 +1,147 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import { addNewAgent } from "../../../backend.mjs";
+
+let message = "";
+let isError = false;
+
+if (Astro.request.method === "POST") {
+    const data = await Astro.request.formData();
+    const agent = {
+        Prenom: data.get("prenom")?.toString() ?? "",
+        Nom: data.get("nom")?.toString() ?? "",
+        Email: data.get("email")?.toString() ?? "",
+        Telephone: data.get("telephone")?.toString() ?? "",
+    };
+
+    try {
+        await addNewAgent(agent);
+        message = "Agent ajoute avec succes.";
+    } catch (error) {
+        console.error("Erreur ajout agent", error);
+        message = "Impossible d'ajouter l'agent.";
+        isError = true;
+    }
+}
+---
+
+<Layout titre="Ajouter un agent">
+    <div class="agent-container">
+        <h1 class="agent-title">Ajouter un agent</h1>
+        {
+            message && (
+                <div class:list={["agent-alert", { error: isError }]}>
+                    {message}
+                </div>
+            )
+        }
+
+        <form method="POST" action="/agents/add" class="agent-form">
+            <div class="form-row">
+                <label for="prenom">Prenom</label>
+                <input id="prenom" name="prenom" type="text" required />
+            </div>
+            <div class="form-row">
+                <label for="nom">Nom</label>
+                <input id="nom" name="nom" type="text" required />
+            </div>
+            <div class="form-row">
+                <label for="email">Email</label>
+                <input id="email" name="email" type="email" required />
+            </div>
+            <div class="form-row">
+                <label for="telephone">Telephone</label>
+                <input id="telephone" name="telephone" type="tel" />
+            </div>
+            <button type="submit" class="agent-btn">Ajouter</button>
+        </form>
+    </div>
+</Layout>
+
+<style>
+    .agent-container {
+        max-width: 520px;
+        margin: 2.5rem auto;
+        background: #ffffff;
+        border-radius: 14px;
+        box-shadow: 0 6px 22px rgba(0, 0, 0, 0.08);
+        padding: 2rem 2rem 1.6rem;
+    }
+
+    .agent-title {
+        text-align: center;
+        margin: 0 0 1.2rem 0;
+        font-size: 1.5rem;
+        color: #1f2937;
+    }
+
+    .agent-alert {
+        border-radius: 8px;
+        padding: 0.85rem 1rem;
+        margin-bottom: 1rem;
+        text-align: center;
+        background: #e0ffe0;
+        color: #155724;
+        font-weight: 600;
+    }
+
+    .agent-alert.error {
+        background: #ffe4e6;
+        color: #9f1239;
+    }
+
+    .agent-form {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .form-row {
+        display: flex;
+        flex-direction: column;
+        gap: 0.35rem;
+    }
+
+    .form-row label {
+        font-weight: 600;
+        color: #374151;
+        font-size: 0.98rem;
+    }
+
+    .form-row input {
+        padding: 0.55rem 0.75rem;
+        border-radius: 8px;
+        border: 1px solid #d1d5db;
+        background: #f9fafb;
+        font-size: 1rem;
+        transition:
+            border-color 0.2s,
+            box-shadow 0.2s;
+    }
+
+    .form-row input:focus {
+        outline: none;
+        border-color: #4a4e69;
+        box-shadow: 0 0 0 3px rgba(74, 78, 105, 0.15);
+    }
+
+    .agent-btn {
+        margin-top: 0.5rem;
+        background: #4a4e69;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        padding: 0.65rem 1.2rem;
+        font-weight: 700;
+        font-size: 1rem;
+        cursor: pointer;
+        transition:
+            background 0.2s,
+            transform 0.15s;
+    }
+
+    .agent-btn:hover {
+        background: #9a8c98;
+        transform: translateY(-1px);
+    }
+</style>
